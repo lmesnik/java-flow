@@ -4,7 +4,10 @@ import static com.matthisk.flow.SyncFlow.flow;
 import static com.matthisk.flow.operators.Operators.flatMap;
 import static com.matthisk.flow.operators.Operators.flattenMerge;
 import static com.matthisk.flow.operators.Operators.map;
+import static com.matthisk.flow.operators.Terminators.toList;
 
+import java.io.PrintStream;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadFactory;
@@ -29,15 +32,15 @@ public class Main {
                             })
                             .flowOn(scheduler);
 
-            scheduler.submit(
-                    () -> {
-                        fl.collect(
-                                value ->
-                                        System.out.printf(
-                                                "[%s] %s\n",
-                                                Thread.currentThread().getName(), value));
-                    });
+            List<Object> result = fl.terminate(toList());
+
+            System.out.println(result);
         }
+    }
+
+    private static PrintStream print(Object value) {
+        return System.out.printf(
+            "[%s] %s\n", Thread.currentThread().getName(), value);
     }
 
     public static void main3(String[] args) {
@@ -80,15 +83,13 @@ public class Main {
                 .pipe(
                         map(
                                 value -> {
-                                    System.out.printf(
-                                            "[%s] %s\n", Thread.currentThread().getName(), value);
+                                    print(value);
                                     return value.length();
                                 }))
                 .flowOn(executorService)
                 .collect(
                         size ->
-                                System.out.printf(
-                                        "[%s] %s\n", Thread.currentThread().getName(), size));
+                            print(size));
     }
 
     public static void main2(String[] args) throws InterruptedException {

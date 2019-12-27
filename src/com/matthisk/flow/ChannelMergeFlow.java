@@ -1,7 +1,8 @@
 package com.matthisk.flow;
 
+import static com.matthisk.flow.ChannelFlowUtils.channelToCollector;
+
 import com.matthisk.flow.channels.Channel;
-import com.matthisk.flow.channels.Envelope;
 import com.matthisk.flow.channels.RendezvousChannel;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Semaphore;
@@ -44,20 +45,6 @@ public class ChannelMergeFlow<T> extends AbstractFlow<T> {
             });
         });
 
-        while (true) {
-            Envelope<T> envelope = channel.receive();
-
-            if (envelope.getValue() != null) {
-                collector.emit(envelope.getValue());
-            }
-
-            if (envelope.getCause() != null) {
-                throw new RuntimeException("Received failure from channel", envelope.getCause());
-            }
-
-            if (envelope.isComplete()) {
-                break;
-            }
-        }
+        channelToCollector(channel, collector);
     }
 }

@@ -9,7 +9,7 @@ import java.util.function.Predicate;
 
 public class Operators {
     public static <A, B> FlowOperator<A, B> map(Function<A, B> fn) {
-        return inner -> SyncFlow.flow(collector -> inner.collect(value -> collector.emit(fn.apply(value))));
+        return inner -> SyncFlow.flow(producer -> inner.collect(value -> producer.emit(fn.apply(value))));
     }
 
     public static <A> FlowOperator<A, A> filter(Predicate<A> predicate) {

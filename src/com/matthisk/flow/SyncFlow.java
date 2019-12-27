@@ -13,7 +13,7 @@ public class SyncFlow<T> extends AbstractFlow<T> {
         producer.accept(collector);
     }
 
-    public static <Y> Flow<Y> flow(FlowProducer<Y> consumer) {
-        return new SyncFlow<>(consumer);
+    public static <Y> Flow<Y> flow(FlowProducer<Y> producer) {
+        return new SyncFlow<>(producer);
     };
 }
